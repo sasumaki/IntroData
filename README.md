@@ -7,7 +7,7 @@ Course project for Introduction to Data Science
 
 `git status` Repository status (new files? uncommitted files? Any news?)
 
-`git pull` get changes from repository and update your local codes (also `git fetch` + ´git rebase origin/master`)
+`git pull` get changes from repository and update your local codes (also `git fetch` + `git rebase origin/master`)
 
 `git add .` add all files that you want to commit and which were listed with `git status`
 
