@@ -1,0 +1,16 @@
+------------------------------------------------------------
+------------------------------------------------------------
+
+chra@cs.helsinki.fi
+
+------------------------------------------------------------
+------------------------------------------------------------
+- K-Means
+- Python
+- Pääkaupunkiseutu palveluiden sijoittaminen
+
+- rekisteröi aihe 
+- Ladataan data sisään, piirretään kartalle jotain
+- Algoritmi
+
+- ladataan datoja gittiin
