@@ -16,3 +16,5 @@ Course project for Introduction to Data Science
 
 `git push origin` push your changes to repository so that they're visible to others.
 
+Data: http://geo.stat.fi/geoserver/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=vaki2016_1km_kp&outputFormat=csv
+
