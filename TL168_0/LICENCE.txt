@@ -1,0 +1,8 @@
+﻿Tämä aineisto, jonka tekijä on Liikennevirasto, on lisensoitu Creative Commons Nimeä 4.0 Kansainvälinen -käyttöluvalla - http://creativecommons.org/licenses/by/4.0/deed.fi
+Tätä käyttölupaa laajempia oikeuksia voi olla saatavilla osoitteessa http://www.liikennevirasto.fi
+
+Detta dataset av Trafikverket är licensierad under en Creative Commons Erkännande 4.0 Internationell licens - http://creativecommons.org/licenses/by/4.0/
+Tillstånd utöver denna licens kan vara tillgängligt på http://www.liikennevirasto.fi
+
+This dataset by Finnish Transport Agency is licensed under a Creative Commons Attribution 4.0 International License - http://creativecommons.org/licenses/by/4.0/
+Permissions beyond the scope of this license may be available at http://www.liikennevirasto.fi

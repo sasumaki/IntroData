@@ -1,51 +1,87 @@
 # Python modules
 import matplotlib.pyplot as plt
 import geopandas as gpd
-import geopandas_osm.osm as osm
 from shapely.geometry.polygon import LinearRing, Polygon
+from shapely.geometry import Point
+import ctypes
+from descartes import PolygonPatch
+import math
 
 
 
 # Own modules
 import readFiles
+import geopandas_osm.osm as osm
+import Color
+
 
 def main():
 	data=readFiles.readFiles()
+	
 	plt.plot(data.xkoord, data.ykoord, '.', alpha=0.05)
 	plt.show()
 
 
+def wrangleData(df):
+	values_to_remove = ["FID","grd_id","gid"]
+
+	for val in values_to_remove:
+		del df[val]
+    
+	return df
+
+
 #Plot the metropolitan area colormapped by population and background map with postal-areas
 #EPSG:3067: ETRS89 / ETRS-TM35FIN / EUREF-FIN
+#Areacodes: Helsinki = 91, Espoo = 49, Vantaa = 92, Kauniainen = 235
 
 def plotMetropolitan():
 	df=readFiles.readFiles()
-	#codes: Helsinki = 91, Espoo = 49, Vantaa = 92, Kauniainen = 235
+	df = wrangleData(df)
 	df = df[(df["kunta"] == 91) | (df["kunta"] == 49) | (df["kunta"] == 92) | (df["kunta"] == 235)]
 
-	df_road = gpd.read_file("metropolitan/metropolitan_finland_roads_gen1.geojson")
-
+	df_road = gpd.read_file("metropolitan/metropolitan_helsinki_roads_gen1.geojson")
 	df_road = df_road.to_crs(epsg=3067)
-	df_admin = gpd.read_file("metropolitan/metropolitan_finland_admin.geojson")
+	df_admin = gpd.read_file("metropolitan/metropolitan_helsinki_admin.geojson")
 	df_admin = df_admin.to_crs(epsg=3067)
 
 
-	ax = df_road.plot(color="blue", alpha=1,linewidth=0.5, zorder=-1)
-
+	ax = df_road.plot(color="rebeccapurple", alpha=1,linewidth=0.5, zorder=0)
+	boundaries = list()
+	pops = list()
 	for i in xrange(0,len(df_admin)):
-		boundary = df_admin.ix[i].geometry
-		x,y = boundary.exterior.xy
-		ax.plot(x,y,color="black",linewidth=0.8,zorder=0)
-
+		adminlevel = df_admin.ix[i].admin_leve
+		if  adminlevel <= 9 or adminlevel == 11:
+			boundary = df_admin.ix[i].geometry
+			totalpop = 0
+			for  kunta, id_nro, vaesto, miehet, naiset, ika1,ika2,ika3,x,y,point in df.values:
+				point = Point(x,y)
+				if boundary.contains(point):
+					totalpop = totalpop + vaesto
+								
+			boundaries.append(boundary)
+			pops.append(totalpop)
+	minpop = min(pops)
+	maxpop = max(pops)
 	
-
+	print(pops)
+	for pop in pops:
+		pop = (pop-minpop)/(maxpop-minpop)
+	print(pops)	
+	patch = PolygonPatch(boundary, alpha=0.5, zorder=-1, fc=col)
+	ax.add_patch(patch)
+		
 	#This is for creating a colormap of the populations
-	cm = plt.cm.get_cmap('YlOrRd')
-	vmin = df["vaesto"].argmin()
-	vmax = (df["vaesto"].argmax()-df["vaesto"].mean())/2
+	cm = plt.cm.get_cmap('Wistia')
+	df["vaestolog"] = df["vaesto"]
+	df["vaestolog"] = df["vaestolog"].apply(lambda x: math.log(x))
 
-	plt.scatter(df.xkoord, df.ykoord, c=df["vaesto"], s=20, alpha=1, cmap = cm,vmin = vmin, vmax = vmax, zorder=1)	
-	ax.set_axis_bgcolor("lightgray")
+	padding = df["vaestolog"].mean()/2
+	vmin = df["vaesto"].argmin()
+	vmax = df["vaesto"].argmax()
+
+	plt.scatter(df.xkoord, df.ykoord, c=df["vaesto"], s=25, alpha=1, cmap = cm,vmin = vmin, vmax = vmax, zorder=1)	
+	ax.set_facecolor("silver")
 	plt.show()
 
 
