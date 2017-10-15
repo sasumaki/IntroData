@@ -1,18 +1,19 @@
 # Python modules
-import matplotlib.pyplot as plt
 import geopandas as gpd
 from shapely.geometry.polygon import LinearRing, Polygon
 from shapely.geometry import Point
 import ctypes
 from descartes import PolygonPatch
 import math
+import matplotlib.colors as colors
+import matplotlib.cm as cmx
+import matplotlib.pyplot as plt
 
 
 
 # Own modules
 import readFiles
 import geopandas_osm.osm as osm
-import Color
 
 
 def main():
@@ -35,11 +36,11 @@ def wrangleData(df):
 #EPSG:3067: ETRS89 / ETRS-TM35FIN / EUREF-FIN
 #Areacodes: Helsinki = 91, Espoo = 49, Vantaa = 92, Kauniainen = 235
 
-def plotMetropolitan():
-	df=readFiles.readFiles()
+def plotMetropolitan(scatterMap):
+	df = readFiles.readFiles()
 	df = wrangleData(df)
 	df = df[(df["kunta"] == 91) | (df["kunta"] == 49) | (df["kunta"] == 92) | (df["kunta"] == 235)]
-
+   
 	df_road = gpd.read_file("metropolitan/metropolitan_helsinki_roads_gen1.geojson")
 	df_road = df_road.to_crs(epsg=3067)
 	df_admin = gpd.read_file("metropolitan/metropolitan_helsinki_admin.geojson")
@@ -50,41 +51,51 @@ def plotMetropolitan():
 	boundaries = list()
 	pops = list()
 	for i in xrange(0,len(df_admin)):
-		adminlevel = df_admin.ix[i].admin_leve
-		if  adminlevel <= 9 or adminlevel == 11:
+		#adminlevel = df_admin.ix[i].admin_leve
+		#if  adminlevel <= 9 or adminlevel == 11:
 			boundary = df_admin.ix[i].geometry
 			totalpop = 0
+			squares = 1
 			for  kunta, id_nro, vaesto, miehet, naiset, ika1,ika2,ika3,x,y,point in df.values:
 				point = Point(x,y)
 				if boundary.contains(point):
 					totalpop = totalpop + vaesto
+					squares = squares + 1
 								
 			boundaries.append(boundary)
+			totalpop = totalpop/squares
 			pops.append(totalpop)
-	minpop = min(pops)
-	maxpop = max(pops)
 	
-	print(pops)
-	for pop in pops:
-		pop = (pop-minpop)/(maxpop-minpop)
-	print(pops)	
-	patch = PolygonPatch(boundary, alpha=0.5, zorder=-1, fc=col)
-	ax.add_patch(patch)
+	jet = cm = plt.get_cmap('Wistia') 
+	cNorm  = colors.Normalize(vmin=min(pops), vmax=max(pops))
+	scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+	idx = 0
+	for boundary in boundaries:
+		if scatterMap == True:
+			col = "grey"
+		else:
+			col = scalarMap.to_rgba(pops[idx])
+		patch = PolygonPatch(boundary, alpha=0.75, zorder=-1, fc=col)
+		ax.add_patch(patch)
+		idx = idx + 1 
+		
+
 		
 	#This is for creating a colormap of the populations
-	cm = plt.cm.get_cmap('Wistia')
-	df["vaestolog"] = df["vaesto"]
-	df["vaestolog"] = df["vaestolog"].apply(lambda x: math.log(x))
+	if(scatterMap == True):
+		cm = plt.cm.get_cmap('Wistia')
+		df["vaestolog"] = df["vaesto"]
+		df["vaestolog"] = df["vaestolog"].apply(lambda x: math.log(x))
 
-	padding = df["vaestolog"].mean()/2
-	vmin = df["vaesto"].argmin()
-	vmax = df["vaesto"].argmax()
+		padding = df["vaestolog"].mean()/2
+		vmin = df["vaesto"].argmin()
+		vmax = df["vaesto"].argmax()
 
-	plt.scatter(df.xkoord, df.ykoord, c=df["vaesto"], s=25, alpha=1, cmap = cm,vmin = vmin, vmax = vmax, zorder=1)	
+		plt.scatter(df.xkoord, df.ykoord, c=df["vaesto"], s=25, alpha=1, cmap = cm,vmin = vmin, vmax = vmax, zorder=1)	
 	ax.set_facecolor("silver")
-	plt.show()
+	plt.savefig("temp.png")
 
 
 print("execute main")
-plotMetropolitan()
+plotMetropolitan(True)
 print("done")

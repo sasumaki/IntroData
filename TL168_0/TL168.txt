@@ -1,1 +1,0 @@
-http://extranet.liikennevirasto.fi:80/geoserver/avoin/wfs?SERVICE=wfs&version=1.0.0&request=GetFeature&srsName=EPSG:3067&outputFormat=SHAPE-ZIP&typeNames=TL168&bbox=-657932,6494138,1791476,7798714
