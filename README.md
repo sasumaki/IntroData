@@ -20,3 +20,9 @@ Course project for Introduction to Data Science
 Data: http://geo.stat.fi/geoserver/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=vaki2016_1km_kp&outputFormat=csv
 
 Kuntajako kartalle: http://geoserv.stat.fi:8080/geoserver/tilastointialueet/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=tilastointialueet:kunta1000k_2017&outputFormat=csv
+
+Espoon rakennukset: http://geoserver.hel.fi/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeName=osm:esp_rakennukset_dist&outputFormat=json
+
+Vantaan rakennukset: korvaa esp-->van
+
+Helsingin rakennukset: korvaa esp--> hel (huom, ei toimi)
