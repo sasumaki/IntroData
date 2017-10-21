@@ -61,7 +61,7 @@ def plotMetropolitan(scatterMap):
 		x = centroid.x
 		y = centroid.y
 		if  adminlevel == 10:
-			ax.annotate(df_admin.ix[i]["name"], xy=(x,y), ha='center',s=0.2)
+			ax.annotate(df_admin.ix[i]["name"], xy=(x,y), ha='center')
 		totalpop = 0
 		squares = 1
 		for  kunta, id_nro, vaesto, miehet, naiset, ika1,ika2,ika3,x,y,point in df.values:
