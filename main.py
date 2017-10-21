@@ -55,20 +55,24 @@ def plotMetropolitan(scatterMap):
 	boundaries = list()
 	pops = list()
 	for i in xrange(0,len(df_admin)):
-		#adminlevel = df_admin.ix[i].admin_leve
-		#if  adminlevel < 10:
-			boundary = df_admin.ix[i].geometry
-			totalpop = 0
-			squares = 1
-			for  kunta, id_nro, vaesto, miehet, naiset, ika1,ika2,ika3,x,y,point in df.values:
-				point = Point(x,y)
-				if boundary.contains(point):
-					totalpop = totalpop + vaesto
-					squares = squares + 1
-								
-			boundaries.append(boundary)
-			totalpop = totalpop/squares
-			pops.append(totalpop)
+		adminlevel = df_admin.ix[i].admin_leve
+		boundary = df_admin.ix[i].geometry
+		centroid = boundary.centroid
+		x = centroid.x
+		y = centroid.y
+		if  adminlevel == 10:
+			ax.annotate(df_admin.ix[i]["name"], xy=(x,y), ha='center',s=0.2)
+		totalpop = 0
+		squares = 1
+		for  kunta, id_nro, vaesto, miehet, naiset, ika1,ika2,ika3,x,y,point in df.values:
+			point = Point(x,y)
+			if boundary.contains(point):
+				totalpop = totalpop + vaesto
+				squares = squares + 1
+							
+		boundaries.append(boundary)
+		totalpop = totalpop/squares
+		pops.append(totalpop)
 	
 	jet = cm = plt.get_cmap('Wistia') 
 	cNorm  = colors.Normalize(vmin=min(pops), vmax=max(pops))
