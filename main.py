@@ -48,14 +48,15 @@ def plotMetropolitan(scatterMap):
 	df_road = df_road.to_crs(epsg=3067)
 	df_admin = gpd.read_file("metropolitan/metropolitan_helsinki_admin.geojson")
 	df_admin = df_admin.to_crs(epsg=3067)
+	
+	fig, ax = plt.subplots()
 
-
-	ax = df_road.plot(color="rebeccapurple", alpha=1,linewidth=0.5, zorder=0)
+	df_road.plot(ax=ax, color="rebeccapurple", alpha=1,linewidth=0.5, zorder=0)
 	boundaries = list()
 	pops = list()
 	for i in xrange(0,len(df_admin)):
 		#adminlevel = df_admin.ix[i].admin_leve
-		#if  adminlevel <= 9 or adminlevel == 11:
+		#if  adminlevel < 10:
 			boundary = df_admin.ix[i].geometry
 			totalpop = 0
 			squares = 1
@@ -74,17 +75,18 @@ def plotMetropolitan(scatterMap):
 	scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 	idx = 0
 	for boundary in boundaries:
+		if not isinstance(boundary, Polygon):
+			continue
 		if scatterMap == True:
 			col = "grey"
 		else:
 			col = scalarMap.to_rgba(pops[idx])
-		patch = PolygonPatch(boundary, alpha=0.75, zorder=-1, fc=col)
+		patch = PolygonPatch(boundary,gid=idx, alpha=0.75, zorder=-1, fc=col)
 		ax.add_patch(patch)
 		idx = idx + 1 
 		
 
 	df_hsl = gpd.read_file("HSL_stopsbyroutes/HSLn_pysakit_linjoittain.shp")
-	print(df_hsl)
 
 	df_hsl = df_hsl.to_crs({'init': 'epsg:3067'})
 	df_hsl["xkoord"] = df_hsl["geometry"].x
@@ -101,15 +103,17 @@ def plotMetropolitan(scatterMap):
 	#weight vars: 'vaesto', 'miehet', 'naiset','ika_0_14', 'ika_15_64', 'ika_65_'
 	weightedData=kmeansInput(df, 'vaesto')
 	weightedHSL = np.array(df_hsl[["xkoord", "ykoord"]])
+	weightedHSL = np.repeat(weightedHSL, 50,axis=0)
+	
 	weightedHSL = weightedHSL[:,:2]* 1.0
 
 	
 
-	print(weightedData.shape, weightedHSL.shape)
 	weightedData = np.concatenate((weightedData, weightedHSL))
-	result = kmeans2(weightedData,3)
+
+	result = kmeans2(weightedData,5)
 	tulos=np.array(result[0])
-	plt.plot(tulos[:,0], tulos[:,1], 'D', markersize=15,markerfacecolor='red')
+	plt.plot(tulos[:,0], tulos[:,1], 'o', markersize=15,markerfacecolor='red')
 
 	if(scatterMap == True):
 		scattermap(df)
@@ -117,6 +121,14 @@ def plotMetropolitan(scatterMap):
 	ax.set_facecolor("silver")
 	ax.axes.get_xaxis().set_visible(False)
 	ax.axes.get_yaxis().set_visible(False)
+	def on_plot_hover(event):
+         for curve in plot.get_lines():
+        	if curve.contains(event)[0]:
+            	 print "over %s" % curve.get_gid()
+
+	#plt.ion()
+	#fig.canvas.mpl_connect('motion_notify_event', on_plot_hover)  
+	plt.show()
 	plt.savefig("temp.png")
 
 def scattermap(df):
@@ -132,5 +144,5 @@ def scattermap(df):
 
 
 print("execute main")
-plotMetropolitan(True)
+plotMetropolitan(False)
 print("done")
