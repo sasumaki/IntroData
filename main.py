@@ -1,5 +1,6 @@
 # Python modules
 import geopandas as gpd
+import pandas as pd
 from shapely.geometry.polygon import LinearRing, Polygon
 from shapely.geometry import Point
 import ctypes
@@ -8,6 +9,8 @@ import math
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
+from scipy.cluster.vq import kmeans2
+import numpy as np
 
 
 
@@ -80,9 +83,43 @@ def plotMetropolitan(scatterMap):
 		idx = idx + 1 
 		
 
-		
-	#This is for creating a colormap of the populations
+	df_hsl = gpd.read_file("HSL_stopsbyroutes/HSLn_pysakit_linjoittain.shp")
+	print(df_hsl)
+
+	df_hsl = df_hsl.to_crs({'init': 'epsg:3067'})
+	df_hsl["xkoord"] = df_hsl["geometry"].x
+	df_hsl["ykoord"] = df_hsl["geometry"].y
+	
+
+	
+
+	def kmeansInput(input0, weightVar):
+         output0=np.array(input0[['xkoord', 'ykoord', weightVar]])
+    	 output0=np.repeat(output0, output0[:,2], axis=0)
+    	 output0=output0[:,:2] * 1.0
+    	 return output0
+	#weight vars: 'vaesto', 'miehet', 'naiset','ika_0_14', 'ika_15_64', 'ika_65_'
+	weightedData=kmeansInput(df, 'vaesto')
+	weightedHSL = np.array(df_hsl[["xkoord", "ykoord"]])
+	weightedHSL = weightedHSL[:,:2]* 1.0
+
+	
+
+	print(weightedData.shape, weightedHSL.shape)
+	weightedData = np.concatenate((weightedData, weightedHSL))
+	result = kmeans2(weightedData,3)
+	tulos=np.array(result[0])
+	plt.plot(tulos[:,0], tulos[:,1], 'D', markersize=15,markerfacecolor='red')
+
 	if(scatterMap == True):
+		scattermap(df)
+
+	ax.set_facecolor("silver")
+	ax.axes.get_xaxis().set_visible(False)
+	ax.axes.get_yaxis().set_visible(False)
+	plt.savefig("temp.png")
+
+def scattermap(df):
 		cm = plt.cm.get_cmap('Wistia')
 		df["vaestolog"] = df["vaesto"]
 		df["vaestolog"] = df["vaestolog"].apply(lambda x: math.log(x))
@@ -91,9 +128,7 @@ def plotMetropolitan(scatterMap):
 		vmin = df["vaesto"].argmin()
 		vmax = df["vaesto"].argmax()
 
-		plt.scatter(df.xkoord, df.ykoord, c=df["vaesto"], s=25, alpha=1, cmap = cm,vmin = vmin, vmax = vmax, zorder=1)	
-	ax.set_facecolor("silver")
-	plt.savefig("temp.png")
+		plt.scatter(df.xkoord, df.ykoord, c=df["vaesto"], s=25, alpha=1, cmap = cm,vmin = vmin, vmax = vmax, zorder=1)
 
 
 print("execute main")
