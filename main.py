@@ -55,13 +55,13 @@ def plotMetropolitan(scatterMap, annotate, numberOfK):
 	df_admin = gpd.read_file("metropolitan/metropolitan_helsinki_admin.geojson")
 	df_admin = df_admin.to_crs(epsg=3067)
 	print(df_admin.geometry)
-	fig = plt.figure()
-	ax = fig.add_subplot(2, 1, 1, aspect='equal', adjustable='box-forced')
+	fig = plt.figure(1)
+	ax = fig.add_subplot(1, 1, 1, aspect='equal', adjustable='box-forced')
 	
 	df_road.plot(ax=ax, color="rebeccapurple", alpha=1,linewidth=0.5, zorder=0)
 	boundaries = list()
 	pops = list()
-	for i in xrange(0,len(df_admin)):
+	for i in range(0,len(df_admin)):
 		adminlevel = df_admin.ix[i].admin_leve
 		boundary = df_admin.ix[i].geometry
 		centroid = boundary.centroid
@@ -107,10 +107,10 @@ def plotMetropolitan(scatterMap, annotate, numberOfK):
 	
 
 	def kmeansInput(input0, weightVar):
-         output0=np.array(input0[['xkoord', 'ykoord', weightVar]])
-    	 output0=np.repeat(output0, output0[:,2], axis=0)
-    	 output0=output0[:,:2] * 1.0
-    	 return output0
+		output0=np.array(input0[['xkoord', 'ykoord', weightVar]])
+		output0=np.repeat(output0, output0[:,2], axis=0)
+		output0=output0[:,:2] * 1.0
+		return output0
 	#weight vars: 'vaesto', 'miehet', 'naiset','ika_0_14', 'ika_15_64', 'ika_65_'
 	weightedData=kmeansInput(df, 'vaesto')
 	weightedHSL = np.array(df_hsl[["xkoord", "ykoord"]])
@@ -145,9 +145,9 @@ def plotMetropolitan(scatterMap, annotate, numberOfK):
 	ax.axes.get_xaxis().set_visible(False)
 	ax.axes.get_yaxis().set_visible(False)
 	def on_plot_hover(event):
-         for curve in plot.get_lines():
-        	if curve.contains(event)[0]:
-            	 print "over %s" % curve.get_gid()
+		for curve in plot.get_lines():
+			if curve.contains(event)[0]:
+				print("over %s" % curve.get_gid())
 
 	#plt.ion()
 	#fig.canvas.mpl_connect('motion_notify_event', on_plot_hover)  
@@ -158,12 +158,12 @@ def plotMetropolitan(scatterMap, annotate, numberOfK):
 def findNearestBuildings(resultPoints, fig, numberOfK):
 	# Rakennusdata samaan tiedostoon ja koordinaattisysteemiin
 	crs0={'init': 'epsg:3067'}
-	rakVan=gpd.read_file("vanRak.json", crs=crs0)
+	rakVan=gpd.read_file("vanRak.json", crs=crs0,encoding="utf-8")
 	rakVan = rakVan.rename(columns={rakVan.columns[4]: "kayttotarkoitus_koodi" })
 
 	rakVan = rakVan.rename(columns={"käyttötarkoitus_koodi": "kayttotarkoitus_koodi"})
-	rakEsp=gpd.read_file("espRak.json", crs=crs0)
-	rakHel=gpd.GeoDataFrame.from_file(r"rakennukset2012/rakennukset_Helsinki_wgs84/rakennukset_Helsinki_06_2012_wgs84.TAB", crs=crs0)
+	rakEsp=gpd.read_file("espRak.json", crs=crs0,encoding="utf-8")
+	rakHel=gpd.GeoDataFrame.from_file(r"rakennukset2012/rakennukset_Helsinki_wgs84/rakennukset_Helsinki_06_2012_wgs84.TAB", crs=crs0,encoding="utf-8")
 	rakVan=rakVan.to_crs({'init': 'epsg:3067'})
 	rakHel=rakHel.to_crs({'init': 'epsg:3067'})
 	rakEsp=rakEsp.to_crs({'init': 'epsg:3067'})
@@ -224,17 +224,18 @@ def findNearestBuildings(resultPoints, fig, numberOfK):
 	points=gpd.GeoDataFrame(retVal[['pointIndex','point']], geometry='point', crs=crs0)
 	print(retVal.head())
 	print(buildingSuggestions.crs)
-	#buildingSuggestions = buildingSuggestions.osoite.str.encode("utf-8")
 	print(len(rak))
 	i=0
+	
 	while i <= max(points["pointIndex"]):
 		print(buildingSuggestions.geometry, buildingSuggestions.crs)
-		buildingPlot = fig.add_subplot(2,numberOfK,numberOfK+i+1,  aspect='equal', adjustable='box-forced')
+		fig = plt.figure(i+2)
+		buildingPlot = fig.add_subplot(111, aspect='equal', adjustable='box-forced')
 		buildingPlot.set_title(i+1)
 		buildingsOfIndex = buildingSuggestions[buildingSuggestions["pointIndex"] == i]
 		df_road = gpd.read_file("metropolitan/metropolitan_helsinki_roads_gen1.geojson")
 		df_road = df_road.to_crs(epsg=3067)
-		df_road.plot(ax=buildingPlot, color="rebeccapurple", alpha=1,linewidth=0.5, zorder=0)
+		df_road.plot(ax=buildingPlot, color="rebeccapurple", alpha=1, zorder=0)
 		axisX = max(buildingsOfIndex["building"].centroid.x)
 		axisX0 = min(buildingsOfIndex["building"].centroid.x)
 		axisY = max(buildingsOfIndex["building"].centroid.y)
@@ -262,7 +263,11 @@ def findNearestBuildings(resultPoints, fig, numberOfK):
 		j = 0
 		for j in range(len(buildingSuggestions[buildingSuggestions["pointIndex"]==i])):
 			#print(buildingSuggestions[buildingSuggestions["pointIndex"]==i]["osoite"].iloc[j])
-			#buildingPlot.annotate(buildingSuggestions[buildingSuggestions["pointIndex"]==i]["osoite"].iloc[j], buildingSuggestions[buildingSuggestions["pointIndex"]==i]["building"].iloc[j].centroid.xy)
+			print("aids")
+			print(buildingSuggestions[buildingSuggestions["pointIndex"]==i]["building"].iloc[j].centroid.x)
+			print(buildingSuggestions[buildingSuggestions["pointIndex"]==i]["building"].iloc[j].centroid.y)
+
+			buildingPlot.annotate(buildingSuggestions[buildingSuggestions["pointIndex"]==i]["osoite"].iloc[j], xy=(buildingSuggestions[buildingSuggestions["pointIndex"]==i]["building"].iloc[j].centroid.x, buildingSuggestions[buildingSuggestions["pointIndex"]==i]["building"].iloc[j].centroid.y))
 			j = j + 1 
 		
 		points[points['pointIndex']==i].plot(ax=buildingPlot)
