@@ -8,7 +8,7 @@ hBanner {
 	padding-left: 10px;
 	padding-right: 10px;
 	width: 100%;
-    font-size: 50px;
+    font-size: 40px;
 }
 div.fixed {
     position: fixed;
@@ -16,6 +16,8 @@ div.fixed {
 	bottom: 70%;
     width: 100%;
 	text-align: center;
+    overflow: hidden;
+    z-index: 999;
 }
 div.centerHeader {
 	position: absolute;
@@ -28,11 +30,12 @@ div.centerHeader {
 }
 div.absolute {
     position: absolute;
-    top: 300px;
+    padding-top: 300px;
 }
 div.body{
-	position: fixed;
-	top: 30%;
+	position:relative;
+    clear: both;
+	padding-top: 200px;
 
 }
 div.body1{
@@ -41,3 +44,7 @@ div.body1{
     padding: 10px;
 
 }
+figcaption{
+	font-weight: 500;
+}
+
