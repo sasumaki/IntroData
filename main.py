@@ -263,7 +263,6 @@ def findNearestBuildings(resultPoints, fig, numberOfK):
 		j = 0
 		for j in range(len(buildingSuggestions[buildingSuggestions["pointIndex"]==i])):
 			#print(buildingSuggestions[buildingSuggestions["pointIndex"]==i]["osoite"].iloc[j])
-			print("aids")
 			print(buildingSuggestions[buildingSuggestions["pointIndex"]==i]["building"].iloc[j].centroid.x)
 			print(buildingSuggestions[buildingSuggestions["pointIndex"]==i]["building"].iloc[j].centroid.y)
 
@@ -309,5 +308,5 @@ def scattermap(df):
 
 
 print("execute main")
-plotMetropolitan(scatterMap=False,annotate=False, numberOfK=5)
+plotMetropolitan(scatterMap=False,annotate=False, numberOfK=4)
 print("done")
