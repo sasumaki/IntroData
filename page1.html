@@ -19,7 +19,7 @@
 	</p>
 	<p>After finding suitable coordinates we took open data about buildings and searched the buildings that are closest and have right purpose of usage.
 	<h2>Warm up: clustering Finland</h2>
-<p>On the scale of whole Finland we used (weighted) k-means and k-medians algorithms to find a set of locations to which some kind of facilities could be placed. The data used for this was 1 km x 1 km resolution data set of Finnish population from Statistics Finland (Tilastokeskus).</p>
+<p>On the scale of whole Finland we used (weighted) k-means and k-medians algorithms to find a set of locations to which some kind of facilities (e.g. public transport centers) could be placed. The data used for this was 1 km x 1 km resolution data set of Finnish population from Statistics Finland (Tilastokeskus).</p>
 <p>You can run the algorithms and calculate a set of locations, or explore precomputed results (it might take some time to calculate them, especially for larger number of locations), using this web app: <a href="https://where-to-place.herokuapp.com">where-to-place.herokuapp.com</a></p>
 	<p>Here is an example with 18 locations/clusters:</p>
 	<p><img src="whereToPlace.png" alt="Finland and 18 counties by k-medians"></p>
@@ -45,7 +45,7 @@
 <p>Simple and slow way of running k-means/k-medians algorithm would be to give it for each person one data point with coordinates of the square kilometer they're living. Instead of this we used a weighted k-means/k-medians algorithm, where each point has a numerical weight, which in practice tells how many different points that one point represents. This way we were able to use only approximately 100 000 data points on the scale of whole Finland, one for each inhabited square kilometer, weights being the number of people living at each square kilometer.</p>
 <p>The k-means (and k-medians) algorithm starts with random initial means, and thus produces (possibly) different results at each run. Because of this, we ran the algorithm multiple times, choosing the result with smallest average distance to the closest mean/median.</p>
 <p>Basic k-means algorithm can be found from many programming libraries, but weighted k-means and k-medians algorithms are a different story. We ended up writing the weighted k-means and k-medians algorithms from scratch. (Using Clojure/ClojureScript, so that you can run the algorithms in your own browser using the above mentioned <a href="https://where-to-place.herokuapp.com">web app</a>.)</p>
-	<h2>Improvents that we didn't have time to do</h2>
+	<h2>Improvements that we didn't have time to do</h2>
 	<p>	<ul>
 	<li>It would nice to interactive visualizations that would show information as you hoover over a point with mouse.</li>
 	<li>More accurate time about traveling times would make our suggestions better.</li>
